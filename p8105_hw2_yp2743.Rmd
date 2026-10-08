@@ -224,3 +224,52 @@ The total weight of trash collected by Professor Trash Wheel was 294.96 tons.
 
 
 ## Problem 3
+
+### Import&read baseline, excluding those with MCI already
+```{r mci_baseline}
+baseline_raw_df = read_csv(
+  "./hw2_data/MCI_baseline.csv",
+  skip = 1,
+  na = c(".", "NA", "")
+) |>
+  janitor::clean_names()
+
+length(pull(baseline_raw_df, id))
+
+baseline_df = baseline_raw_df |>
+  filter(
+    is.na(age_at_onset) | age_at_onset > current_age
+  ) |>
+  mutate(
+    sex = case_match(
+      sex,
+      0 ~ "Female",
+      1 ~ "Male"
+    ),
+    apoe4 = case_match(
+      apoe4,
+      0 ~ "Non-carrier",
+      1 ~ "Carrier"
+    )
+  )
+
+pull(baseline_df, id)|>
+  length()
+
+mci_cases_df = baseline_df |>
+  filter(!is.na(age_at_onset))
+
+pull(mci_cases_df, id)|>
+  length()
+
+pull(baseline_df, current_age)|>
+  mean()
+
+women_df = baseline_df |>
+  filter(sex == "Female")
+
+mean(pull(women_df, apoe4) == "Carrier")
+```
+This part, I skipped the first explanatory row and cleaned out missing values (periods). Then I formatted sex and APOE4 carrier status by character (for sex where 0=female, 1=sex, for apoe4 where 0=non-carrier, 1=carrier). 
+Among the 483 recruited participants, 4 with MCI onset before the baseline age were excluded. 
+93 developed MCI during follow-up among the remaining 479 eligible participants, with the baseline age 65.03 year-old, with 30% of women being APOE4 carriers.
