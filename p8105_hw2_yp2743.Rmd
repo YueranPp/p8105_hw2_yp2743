@@ -12,7 +12,7 @@ library(tidyverse)
 ```
 
 ## Problem 1
-```{r import}
+```{r import_subway}
  subway_df = 
   read_csv(file = "./hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",
   na = c(".", "NA", ""),
@@ -143,5 +143,73 @@ Among all 60 A train stations served, 17 of them are ADA compliant.
 
 
 ## Problem 2
+```{r import_trash_wheels}
+mr_df = readxl::read_excel(
+ "./hw2_data/202610 Trash Wheel Collection Data.xlsx",
+ sheet = "Mr.Trash Wheel",
+range = "A2:N742"
+)|>
+janitor::clean_names()|>
+drop_na(dumpster) |>
+mutate(
+  sports_balls = round(sports_balls),
+  sports_balls = as.integer(sports_balls),
+  year = as.integer(year),
+  wheel= "Mr.Trash Wheel"
+  )
+
+prof_df = readxl::read_excel(
+ "./hw2_data/202610 Trash Wheel Collection Data.xlsx",
+ sheet = "Professor Trash Wheel",
+range = "A2:M139"
+)|>
+janitor::clean_names()|>
+drop_na(dumpster) |>
+mutate(
+  year = as.integer(year),
+  wheel= "Professor Trash Wheel")
+
+gwynnda_df = readxl::read_excel(
+ "./hw2_data/202610 Trash Wheel Collection Data.xlsx",
+ sheet = "Gwynnda the Good Wheel of the W",
+range = "A2:L394"
+)|>
+janitor::clean_names()|>
+drop_na(dumpster) |>
+mutate(
+  year = as.integer(year),
+  wheel= "Gwynnda")
+```
+
+### combine 3 sheets
+
+```{r combine_3_wheels} 
+trash_df = bind_rows(
+  mr_df,
+  prof_df,
+  gwynnda_df
+)
+str(trash_df)
+```
+
+### count 
+```{r total_trash} 
+prof_wt_just_in_case = drop_na(prof_df, weight_tons)
+prof_wt = pull(prof_wt_just_in_case, weight_tons)
+prof_sum_wt = mean(prof_wt)*length(prof_wt)
+prof_wt
+
+gwynnda_June22 = filter(
+   gwynnda_df,
+   month == "June",
+   year == 2022
+)
+
+gwynnda_June22 = drop_na(gwynnda_df, cigarette_butts)
+gwynnda_cigbt = pull(gwynnda_df, cigarette_butts)
+
+gwynnda_count_cigbt = mean(gwynnda_cigbt)*length(gwynnda_cigbt)
+
+```
 
 ## Problem 3
