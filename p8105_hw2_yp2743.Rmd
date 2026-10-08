@@ -1,7 +1,7 @@
 ---
 title: "Homework 2"
 author: "Yueran Pan"
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -282,7 +282,7 @@ amyloid_df = read_csv(
 ) |>
   janitor::clean_names() |>
   rename(id = study_id)
-#in order to merge two sheets, keep name of 'id' consistent
+#in order to merge two sheets, keep name consistent. chose 'id' from bsl, renaming amyld's.
 
 amyloid_long_df = amyloid_df |>
   pivot_longer(
@@ -305,4 +305,37 @@ str(amyloid_long_df)
 ```
 Continue on, like how I treated baseline.csv, I convert the column title variables to lower cases and renamed participant identified to id to keep variables consistent. I transposed the five measurement columns into visit and amyloid ratio, then coded subsequent visit year since baseline. The resulting dataset contains 2435 partipants' visit records from 487 participants. And because I `pivot_long`, any missing  biomarker measurements were remained, shown as NA (Each participant has 5 visit slots)
 
+```{r crosscheck_ids}
+baseline_ids = pull(baseline_df, id)
+amyloid_ids = pull(amyloid_df, id)
 
+baseline_only_df = baseline_df |>
+  filter(!(id %in% amyloid_ids))
+
+amyloid_only_df = amyloid_df |>
+  filter(!(id %in% baseline_ids))
+
+length(pull(baseline_only_df, id))
+length(pull(amyloid_only_df, id))
+```
+8 participants appeared only in the baseline datasets. Another 16 participants appeared only in the amyloid datasets.
+
+```{r merge_those_appear_in_both_amy_and_base}
+
+baseline_matched_df = baseline_df |>
+  filter(id %in% amyloid_ids)
+
+merge_mci_df = left_join(
+  baseline_matched_df,
+  amyloid_long_df,
+  by = "id"
+)       
+
+length(pull(baseline_matched_df, id))
+str(merge_mci_df)
+
+#export csv
+write_csv(merge_mci_df,"./hw2_data/mci_merged.csv")
+```
+
+As a result, I obtained 471 partcipants from the merged data, combining their baseline characteristics with the longitudinal biomarker records by id. There were 2,355 participants' visit records, and 8 variables [2.355 x 8]. Csv were exported.
