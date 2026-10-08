@@ -12,7 +12,7 @@ library(tidyverse)
 ```
 
 ## Problem 1
-```{r import_subway_modify_in_advance}
+```{r import}
  subway_df = 
   read_csv(file = "./hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",
   na = c(".", "NA", ""),
@@ -56,7 +56,7 @@ subway_df = mutate(subway_df,
 
 About this dataset:
 
-The dataset originally contained records of NYC subway entrances and exits, including line, station name, routes served, entry permission, vending availability, and so on. I cleaned the column names to lower case, retained the specified columns (line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance), and converted column `entry` from a character variable to a logical variable. The resulting dataset has 1,868 rows and 19 columns. It is not yet completely tidy because route names are spread across multiple columns, from route1 to route11.
+The dataset originally contained records of NYC subway entrances and exits,  including 32 variables, such as line, station name, routes served, entry permission, vending availability, and so on. I cleaned the column names to lower case, retained the specified columns (line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance), and converted column `entry` from a character variable to a logical variable. The resulting dataset has 1,868 rows and 19 columns. It is not yet completely tidy because route names are spread across multiple columns, from route1 to route11.
 
 ### Prob1, Q1: How many distinct stations are there?
 ```{r count_stations}
@@ -68,7 +68,7 @@ stations_df = distinct(
 str(stations_df)
 
 ```
-There are 464 distinct stations, identified by the combination of line and station name.
+There are 465 distinct stations, identified by the combination of line and station name.
 
 
 
@@ -100,10 +100,47 @@ mean(wo_vend_entry == TRUE)
 
 ### Prob1,Q4: Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
 
-```{r}
+```{r a_train_stations}
+# Reshape route columns into route number and route name.
+subway_long_df = pivot_longer(
+  subway_df,
+  route1:route11,
+  names_to = "route_number",
+  names_prefix = "route",
+  values_to = "route_name"
+)
+subway_long_df = drop_na(subway_long_df, route_name)
 
+# Keep records serving the A train.
+a_train_df = filter(
+  subway_long_df,
+  route_name == "A"
+)
+# Count distinct A train stations.
+a_stations_df = distinct(
+  a_train_df,
+  line,
+  station_name
+)
+#check
+str(a_stations_df)
 
+# Count distinct ADA-compliant A train stations.
+a_ada_df = filter(
+  a_train_df,
+  ada == TRUE
+)
+a_ada_stations_df = distinct(
+  a_ada_df,
+  line,
+  station_name
+)
+#final check
+str(a_ada_stations_df)
 ```
+Among all 60 A train stations served, 17 of them are ADA compliant.
+
+
 
 ## Problem 2
 
