@@ -311,7 +311,7 @@ amyloid_long_df = amyloid_df |>
 
 str(amyloid_long_df)
 ```
-Continue on, like how I treated baseline.csv, I convert the column title variables to lower cases and renamed participant identified to id to keep variables consistent. I transposed the five measurement columns into visit and amyloid ratio, then coded subsequent visit year since baseline. The resulting dataset contains 2435 partipants' visit records from 487 participants. And because I `pivot_long`, any missing  biomarker measurements were kept as NA, (Each participant has 5 visit records).
+Continue on, like how I treated baseline.csv, I convert the column title variables to lower cases and renamed participant identified to id to keep variables consistent. I transposed the five measurement columns into visit and amyloid ratio, then coded subsequent visit year since baseline. The resulting dataset contains 2435 participants' visit records from 487 participants. And because I `pivot_long`, any missing  biomarker measurements were kept as NA, (Each participant has 5 visit records).
 
 ```{r crosscheck_ids}
 baseline_ids = pull(baseline_df, id)
