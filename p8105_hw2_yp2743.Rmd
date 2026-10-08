@@ -14,11 +14,56 @@ library(tidyverse)
 ## Problem 1
 ```{r import_subway}
 subway_df = read_csv(
-    "hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",
-     skip = 10, col_names = FALSE)
+    "hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")
 head(subway_df)
+```
+
+
+```{r read_clean}
+
+names(subway_df)
+#clean names to lower case
+subway_df = janitor::clean_names(subway_df)
+#check new name
+names(subway_df)
+
+#Keep the column specified
+subway_df = select (
+    subway_df, 
+    line:entry, 
+    vending,
+    ada
+    )
+
+#Convert the entry variable from character to logical variable using case_match function
+
+subway_df = mutate(subway_df,
+  entry = case_match(
+    entry, 
+    "YES" ~ TRUE,
+    "NO"~ FALSE
+  )
+)
+```
+
+
+About this dataset:
+
+The dataset originally contained records of NYC subway entrances and exits, including line, station name, routes served, entry permission, vending availability, and so on. I cleaned the column names to lower case, retained the specified columns (line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance), and converted column `entry` from a character variable to a logical variable. The resulting dataset has 1,868 rows and 19 columns. It is not yet completely tidy because route names are spread across multiple columns, from route1 to route11.
+
+###Prob1,Q1:How many distinct stations are there?
+```{r count_stations}
+stations_df = distinct(
+  subway_df,
+  line,
+  station_name
+)
+str(stations_df)
 
 ```
+
+There are 464 distinct stations, identified by the combination of line and station name.
+
 
 ## Problem 2
 
