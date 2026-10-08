@@ -12,10 +12,17 @@ library(tidyverse)
 ```
 
 ## Problem 1
-```{r import_subway}
-subway_df = read_csv(
-    "hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")
-head(subway_df)
+```{r import_subway_modify_in_advance}
+ subway_df = 
+  read_csv(file = "./hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv",
+  na = c(".", "NA", ""),
+  col_types = cols(
+     Route8 = col_character(),
+     Route9 = col_character(),
+     Route10 = col_character(),
+     Route11 = col_character()
+     )
+ )
 ```
 
 
@@ -51,7 +58,7 @@ About this dataset:
 
 The dataset originally contained records of NYC subway entrances and exits, including line, station name, routes served, entry permission, vending availability, and so on. I cleaned the column names to lower case, retained the specified columns (line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance), and converted column `entry` from a character variable to a logical variable. The resulting dataset has 1,868 rows and 19 columns. It is not yet completely tidy because route names are spread across multiple columns, from route1 to route11.
 
-###Prob1,Q1:How many distinct stations are there?
+### Prob1, Q1: How many distinct stations are there?
 ```{r count_stations}
 stations_df = distinct(
   subway_df,
@@ -61,9 +68,42 @@ stations_df = distinct(
 str(stations_df)
 
 ```
-
 There are 464 distinct stations, identified by the combination of line and station name.
 
+
+
+### Prob1, Q2: How many stations are ADA compliant?
+```{r count_ada_stations}
+ada_df = filter(subway_df, ada == TRUE)
+
+ada_df = distinct(
+  ada_df,
+  ada,
+  line,
+  station_name)
+str(ada_df)
+```
+There are 84 ADA compliant stations.
+
+
+### Prob1,Q3: What proportion of station entrances / exits without vending allow entrance?
+```{r entry_and_count_without_vending }
+wo_vending_df = filter(
+  subway_df,
+  vending == "NO"
+)
+wo_vend_entry = pull(wo_vending_df,entry)
+mean(wo_vend_entry == TRUE)
+```
+37.70% of station entrances/exits without vending allow entrance.
+
+
+### Prob1,Q4: Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+
+```{r}
+
+
+```
 
 ## Problem 2
 
