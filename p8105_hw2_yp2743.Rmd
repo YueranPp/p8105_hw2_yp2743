@@ -145,6 +145,7 @@ Among all 60 A train stations served, 17 of them are ADA compliant.
 ## Problem 2
 ```{r import_trash_wheels}
 
+#Mr
 mr_df = readxl::read_excel(
  "./hw2_data/202610 Trash Wheel Collection Data.xlsx",
  sheet = "Mr. Trash Wheel",
@@ -160,6 +161,8 @@ mutate(
   wheel= "Mr. Trash Wheel"
   )
 
+
+#Prof
 prof_df = readxl::read_excel(
  "./hw2_data/202610 Trash Wheel Collection Data.xlsx",
  sheet = "Professor Trash Wheel",
@@ -174,11 +177,13 @@ mutate(
   plastic_bottles = as.integer(plastic_bottles),
   wheel= "Professor Trash Wheel")
 
+
+#Gwynnda
 gwynnda_df = readxl::read_excel(
  "./hw2_data/202610 Trash Wheel Collection Data.xlsx",
  sheet = "Gwynnda the Good Wheel of the W",
-range = "A2:L394",
-)|>
+range = "A2:L394"
+) |>
 janitor::clean_names()|>
 drop_na(dumpster) |>
 mutate(
@@ -197,6 +202,9 @@ trash_df = bind_rows(
 )
 str(trash_df)
 ```
+The merged-3-sheet datasets now contains 1269 observations (dumpster collections) and 15 variables, including collection time(date/month/year), weight in tons, volume in cubic yards, and the wheel identifier. 
+
+
 
 ### count 
 ```{r total_trash} 
@@ -270,15 +278,15 @@ women_df = baseline_df |>
 
 mean(pull(women_df, apoe4) == "Carrier")
 ```
-This part, I skipped the first explanatory row and cleaned out missing values (periods). Then I formatted sex and APOE4 carrier status by character (for sex where 0=female, 1=sex, for apoe4 where 0=non-carrier, 1=carrier). 
+This part, I skipped the first explanatory row and treated '.' as missing values. Then I formatted sex and APOE4 carrier status by character (for sex where 0=female, 1=male, for apoe4 where 0=non-carrier, 1=carrier). 
 Among the 483 recruited participants, 4 with MCI onset before the baseline age were excluded. 
-93 developed MCI during follow-up among the remaining 479 eligible participants, with the baseline age 65.03 year-old, with 30% of women being APOE4 carriers.
+Among the remaining 479 eligible participants, the baseline age is 65.03 year-old, with 30% of women being APOE4 carriers, and 93 developed MCI during follow-up.
 
 ```{r}
 amyloid_df = read_csv(
   "./hw2_data/mci_amyloid.csv",
   skip = 1,
-  na = c(".", "NA", "")
+  na = c(".", "NA", "", "Na")
 ) |>
   janitor::clean_names() |>
   rename(id = study_id)
@@ -303,7 +311,7 @@ amyloid_long_df = amyloid_df |>
 
 str(amyloid_long_df)
 ```
-Continue on, like how I treated baseline.csv, I convert the column title variables to lower cases and renamed participant identified to id to keep variables consistent. I transposed the five measurement columns into visit and amyloid ratio, then coded subsequent visit year since baseline. The resulting dataset contains 2435 partipants' visit records from 487 participants. And because I `pivot_long`, any missing  biomarker measurements were remained, shown as NA (Each participant has 5 visit slots)
+Continue on, like how I treated baseline.csv, I convert the column title variables to lower cases and renamed participant identified to id to keep variables consistent. I transposed the five measurement columns into visit and amyloid ratio, then coded subsequent visit year since baseline. The resulting dataset contains 2435 partipants' visit records from 487 participants. And because I `pivot_long`, any missing  biomarker measurements were kept as NA, (Each participant has 5 visit records).
 
 ```{r crosscheck_ids}
 baseline_ids = pull(baseline_df, id)
@@ -318,7 +326,7 @@ amyloid_only_df = amyloid_df |>
 length(pull(baseline_only_df, id))
 length(pull(amyloid_only_df, id))
 ```
-8 participants appeared only in the baseline datasets. Another 16 participants appeared only in the amyloid datasets.
+After excluding participants with MCI at baseline, 8 participants appeared only in the baseline datasets. Another 16 participants appeared only in the amyloid datasets.
 
 ```{r merge_those_appear_in_both_amy_and_base}
 
@@ -338,4 +346,4 @@ str(merge_mci_df)
 write_csv(merge_mci_df,"./hw2_data/mci_merged.csv")
 ```
 
-As a result, I obtained 471 partcipants from the merged data, combining their baseline characteristics with the longitudinal biomarker records by id. There were 2,355 participants' visit records, and 8 variables [2.355 x 8]. Csv were exported.
+As a result, I obtained 471 participants from the merged data, combining their baseline characteristics with the longitudinal biomarker records by id. There were 2,355 participants' visit records, and 8 variables [2355 x 8]. Csv were exported.
