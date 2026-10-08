@@ -273,3 +273,36 @@ mean(pull(women_df, apoe4) == "Carrier")
 This part, I skipped the first explanatory row and cleaned out missing values (periods). Then I formatted sex and APOE4 carrier status by character (for sex where 0=female, 1=sex, for apoe4 where 0=non-carrier, 1=carrier). 
 Among the 483 recruited participants, 4 with MCI onset before the baseline age were excluded. 
 93 developed MCI during follow-up among the remaining 479 eligible participants, with the baseline age 65.03 year-old, with 30% of women being APOE4 carriers.
+
+```{r}
+amyloid_df = read_csv(
+  "./hw2_data/mci_amyloid.csv",
+  skip = 1,
+  na = c(".", "NA", "")
+) |>
+  janitor::clean_names() |>
+  rename(id = study_id)
+#in order to merge two sheets, keep name of 'id' consistent
+
+amyloid_long_df = amyloid_df |>
+  pivot_longer(
+    baseline:time_8,
+    names_to = "visit",
+    values_to = "amyloid_ratio"
+  ) |>
+  mutate(
+    visit = case_match(
+      visit, 
+      "baseline" ~ 0,
+      "time_2" ~ 2,
+      "time_4" ~ 4,
+      "time_6" ~ 6,
+      "time_8" ~ 8
+    )
+  )
+
+str(amyloid_long_df)
+```
+Continue on, like how I treated baseline.csv, I convert the column title variables to lower cases and renamed participant identified to id to keep variables consistent. I transposed the five measurement columns into visit and amyloid ratio, then coded subsequent visit year since baseline. The resulting dataset contains 2435 partipants' visit records from 487 participants. And because I `pivot_long`, any missing  biomarker measurements were remained, shown as NA (Each participant has 5 visit slots)
+
+
